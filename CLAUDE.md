@@ -3,7 +3,7 @@
 Browser profile warming system for e-commerce. Builds cookies/reputation over sessions.
 
 ## Core Loop
-Screenshot -> AI decides -> Find element -> Human click -> Verify -> Repeat
+Screenshot (720p) -> AI decides -> Find element -> Human click -> Verify -> Repeat
 
 ## Stack
 - AdsPower (fingerprints)
@@ -37,3 +37,4 @@ See `plan.md` for milestones and progress.
 4. If context heavy, tell user to /clear
 5. Strict milestones - complete before moving on
 6. OS-level input ONLY - never use Selenium .click() or .send_keys()
+7. Tests MUST pass + human approval before milestone complete

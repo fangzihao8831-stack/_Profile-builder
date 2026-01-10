@@ -9,7 +9,22 @@ Usage:
 """
 
 import argparse
+import re
 import sys
+
+
+def validate_profile_id(profile_id: str) -> bool:
+    """Validate profile ID to prevent path traversal and injection attacks."""
+    # Only allow alphanumeric, underscore, and hyphen
+    if not re.match(r'^[a-zA-Z0-9_-]+$', profile_id):
+        return False
+    # Prevent path traversal
+    if '..' in profile_id or '/' in profile_id or '\\' in profile_id:
+        return False
+    # Reasonable length limit
+    if len(profile_id) > 64:
+        return False
+    return True
 
 
 def diagnose():
@@ -19,30 +34,21 @@ def diagnose():
     all_ok = True
 
     # Check AdsPower
-    try:
-        import requests
-        resp = requests.get("http://local.adspower.net:50325/status", timeout=2)
-        if resp.status_code == 200:
-            print("[OK] AdsPower connection")
-        else:
-            print("[FAIL] AdsPower returned status", resp.status_code)
-            all_ok = False
-    except Exception as e:
-        print(f"[FAIL] AdsPower connection: {e}")
+    from browser.adspower import check_adspower
+    ads_ok, ads_msg = check_adspower()
+    if ads_ok:
+        print(f"[OK] {ads_msg}")
+    else:
+        print(f"[FAIL] {ads_msg}")
         all_ok = False
 
     # Check Ollama
-    try:
-        import ollama
-        models = ollama.list()
-        qwen_found = any("qwen2.5-vl" in m.get("name", "") for m in models.get("models", []))
-        if qwen_found:
-            print("[OK] Ollama + Qwen2.5-VL")
-        else:
-            print("[WARN] Ollama OK but qwen2.5-vl:7b not found. Run: ollama pull qwen2.5-vl:7b")
-            all_ok = False
-    except Exception as e:
-        print(f"[FAIL] Ollama connection: {e}")
+    from ai.ollama_client import check_ollama
+    ollama_ok, ollama_msg = check_ollama()
+    if ollama_ok:
+        print(f"[OK] {ollama_msg}")
+    else:
+        print(f"[FAIL] {ollama_msg}")
         all_ok = False
 
     # Check PaddleOCR
@@ -124,6 +130,10 @@ def main():
         return diagnose()
 
     if args.profile:
+        if not validate_profile_id(args.profile):
+            print(f"Error: Invalid profile ID '{args.profile}'")
+            print("Profile ID must be alphanumeric with hyphens/underscores only, max 64 chars.")
+            return 1
         return run_session(args.profile, args.duration, args.debug)
 
     parser.print_help()

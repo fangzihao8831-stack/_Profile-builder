@@ -23,12 +23,13 @@
 
 ## Milestones
 
-### Milestone 1: Foundation
-- [ ] Create project structure
-- [ ] Lean CLAUDE.md
-- [ ] requirements.txt
-- [ ] AdsPower connection test
-- [ ] Ollama connection test (Qwen2.5-VL)
+### Milestone 1: Foundation ✓
+- [x] Create project structure
+- [x] Lean CLAUDE.md
+- [x] requirements.txt
+- [x] AdsPower connection test (browser/adspower.py)
+- [x] Ollama connection test (ai/ollama_client.py)
+- [x] Window manager (core/window_manager.py) - bring SunBrowser to foreground
 
 ### Milestone 2: Vision Element Finding
 - [ ] Screenshot capture from AdsPower browser
