@@ -62,32 +62,50 @@
 - [x] Test: Coordinated mouse + keyboard sequences
 - [x] Tests: tests/test_integration_real.py (7 passing)
 
-### Milestone 3: AI Decision Loop (IN PROGRESS)
-**Goal: Human-like browsing** - AI browses fashion sites with realistic behavior
+### Milestone 3: AI Decision Loop ✓ FOUNDATION COMPLETE
+**Branch**: feature/milestone-3.5-grounded-detection
 **Test Profile**: k18il1i6
 
-**Human-Like Requirements**:
-- Dwell time: 5-30s after clicks (simulates reading/viewing)
-- Click variety: Mix of items, images, categories (not just scrolling)
-- Search behavior: Start with search, explore results naturally
-- Natural flow: Search → Browse → Click item → View → Back → Explore
+**Completed**:
+- [x] Action executor (ai/action_executor.py) - Execute click/scroll/navigate
+- [x] Browsing session (core/session.py) - Main loop with timing
+- [x] CLI (run.py) - `python run.py browse <profile_id> --structure fashion`
+- [x] Tests (tests/test_milestone3.py) - 37 tests passing
 
-**Already Drafted** (untracked, ready to commit):
-- [x] Structured action schema (ai/actions.py) - CLICK, TYPE, SCROLL, WAIT, NAVIGATE
-- [x] Decision maker (ai/decision_maker.py) - VLM decides actions with safety checks
-- [x] Session planner (ai/session_planner.py) - NEWS, YOUTUBE, FASHION, FORUMS, SHOPPING
-- [x] Safety checker (core/safety.py) - Blocks logout, purchases, form submissions
+**PROBLEM FOUND - VLM Hallucination**:
+Debug testing revealed 3 critical issues:
+1. **Repeats same element** - Qwen clicks logo 3x despite seeing history in prompt
+2. **Hallucinated text** - Qwen says "MEN" but page shows "HOMBRE" (Spanish)
+3. **Scroll loops** - When uncertain, Qwen just scrolls forever
 
-**To Build**:
-- [ ] Action executor (ai/action_executor.py) - Execute actions using input modules
-- [ ] Browsing session (core/session.py) - Main loop with human-like timing
-- [ ] CLI entry point (run.py) - `python run.py browse <profile_id> --structure fashion`
-- [ ] Tests (tests/test_milestone3.py)
+**Root Cause**: Qwen pattern-matches from training data instead of reading actual screenshot pixels.
 
-**Timing Constants**:
-- DWELL_TIME: 5-30s after clicking items
-- SCROLL_PAUSE: 2-5s after scrolling
-- ACTION_COOLDOWN: 1-2s between actions
+### Milestone 3.5: Grounded Element Detection (NEXT)
+**Goal**: Eliminate VLM hallucination by forcing Qwen to pick from real elements only.
+
+**Solution**: OCR + DOM + OmniParser → Numbered List → Qwen picks NUMBER
+```
+[1] "HOMBRE" (nav) at (100, 50)
+[2] "MUJER" (nav) at (200, 50)
+[3] "Search icon" (icon) at (500, 30)
+
+Pick a NUMBER: {"pick": 1}
+```
+Qwen can ONLY output a number. Coords are pre-extracted. Zero hallucination.
+
+**Files to Create**:
+- [ ] element/dom_parser.py - Selenium DOM extraction
+- [ ] element/ocr_finder.py - PaddleOCR wrapper
+- [ ] element/omni_parser.py - Microsoft OmniParser wrapper
+- [ ] element/element_merger.py - Combine & dedupe sources
+- [ ] element/grounded_list.py - Build numbered prompt list
+- [ ] ai/site_memory.py - Track forbidden elements (failed clicks)
+- [ ] ai/actor.py - Refactored decision maker (pick from list)
+
+**Files to Modify**:
+- [ ] core/session.py - New loop with grounded detection
+
+**See full plan**: .claude/plans/unified-zooming-widget.md
 
 ### Milestone 4: Persona System
 - [ ] Persona schema (demographics, interests, behavior)
