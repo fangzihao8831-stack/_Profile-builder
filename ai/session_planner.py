@@ -66,9 +66,8 @@ STRUCTURE_STARTING_POINTS = {
         "url": "https://www.youtube.com"
     },
     BrowsingStructure.FASHION: {
-        "type": "search",
-        "query": "fashion trends",
-        "fallback_url": "https://www.vogue.com"
+        "type": "direct",
+        "url": "https://www.zara.com"
     },
     BrowsingStructure.FORUMS: {
         "type": "direct",

@@ -70,13 +70,24 @@ class DecisionMaker:
             # Build the prompt
             prompt = self._build_prompt(context)
 
-            self.logger.debug(f"Asking VLM for decision (plan: {context.plan.structure.value})")
+            # DEBUG: Log full prompt
+            self.logger.info("=" * 60)
+            self.logger.info("DECISION MAKER DEBUG")
+            self.logger.info("=" * 60)
+            self.logger.info(f"PROMPT SENT TO QWEN:\n{prompt}")
+            self.logger.info("-" * 60)
 
             # Ask VLM
             response = self.client.ask(prompt, image_path=temp_path)
 
+            # DEBUG: Log raw response
+            self.logger.info(f"QWEN RAW RESPONSE:\n{response.raw}")
+            self.logger.info(f"QWEN PARSED CONTENT: {response.content}")
+            self.logger.info("-" * 60)
+
             # Parse response into action
             action = self._parse_response(response.content)
+            self.logger.info(f"PARSED ACTION: {action}")
 
             # Safety check
             is_safe, reason = self.safety.is_action_safe(action)
@@ -110,37 +121,41 @@ class DecisionMaker:
         # Safety rules
         safety_rules = self.safety.get_safety_rules_prompt()
 
-        prompt = f"""You are a human browsing the web naturally. Your browsing session plan is:
+        # Build forbidden elements from recent actions
+        forbidden = set()
+        for action in recent:
+            if "CLICK on" in action:
+                try:
+                    target = action.split("CLICK on '")[1].rstrip("'")
+                    forbidden.add(target.lower())
+                except:
+                    pass
 
-{context.plan.description}
+        forbidden_str = ", ".join(forbidden) if forbidden else "none"
 
-TIME REMAINING: {minutes}m {seconds}s
+        # Get structure-specific goal
+        structure = context.plan.structure.value
+        goal = context.plan.description
 
-RECENT ACTIONS:
-{recent_str}
+        prompt = f"""SESSION: {structure}
+GOAL: {goal}
 
-{safety_rules}
+FORBIDDEN (already tried, skip these): {forbidden_str}
 
-Look at the current screenshot and decide what a human would naturally do next.
-Stay focused on your browsing plan ({context.plan.structure.value}).
+RECENT: {recent_str}
 
-Respond with ONLY a JSON object in this exact format:
-{{
-    "action": "click" or "type" or "scroll" or "wait" or "navigate",
-    "target": "description of element to click/type into (required for click/type)",
-    "text": "text to type or URL to navigate to (required for type/navigate)",
-    "direction": "up" or "down" (required for scroll)",
-    "duration": number of seconds (required for wait, usually 1-3),
-    "reasoning": "brief explanation of why this action fits your browsing plan"
-}}
+Look at the screenshot. Pick ONE action:
 
-Examples:
-- Click a link: {{"action": "click", "target": "headline about technology news", "reasoning": "interesting news article"}}
-- Scroll down: {{"action": "scroll", "direction": "down", "reasoning": "looking for more content"}}
-- Watch video: {{"action": "wait", "duration": 5, "reasoning": "watching the video"}}
-- Search: {{"action": "type", "target": "search box", "text": "cooking recipes", "reasoning": "searching for content"}}
+RULES:
+1. Cookie/consent popup visible? Click accept button FIRST
+2. Click the EXACT text you see (e.g., "HOMBRE" not "Men", "Aceptar" not "Accept")
+3. DO NOT click: logos, search icons, cart, account icons
+4. DO NOT repeat elements from FORBIDDEN list
 
-What is your next action?"""
+JSON response:
+{{"action": "click", "target": "exact visible text or element", "reasoning": "why"}}
+{{"action": "scroll", "direction": "down", "reasoning": "see more"}}
+{{"action": "navigate", "text": "url.com", "reasoning": "go to site"}}"""
 
         return prompt
 
