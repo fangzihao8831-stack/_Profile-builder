@@ -33,29 +33,54 @@
 - [x] Tests: tests/test_milestone1.py (7 passing)
 - [x] Branch: feature/milestone-1 pushed to GitHub
 
-### Milestone 2: Vision Element Finding
-- [ ] Screenshot capture from AdsPower browser
-- [ ] VLM coordinate extraction (bounding box JSON)
-- [ ] Coordinate translation (image space -> screen space)
-- [ ] Basic click with HumanCursor
-- [ ] Click verification (URL change / visual diff)
+### Milestone 2: Vision Element Finding ✓ COMPLETE
+- [x] Screenshot capture from AdsPower browser (element/screenshot.py)
+- [x] VLM coordinate extraction (element/vlm_finder.py)
+- [x] Coordinate translation (input/coordinates.py)
+- [x] Basic click with HumanCursor (input/mouse.py)
+- [x] Click verification (verification/click_verifier.py)
+- [x] Tests: tests/test_milestone2.py (9 passing)
 
-### Milestone 3: OCR Optimization
-- [ ] PaddleOCR wrapper
-- [ ] Accuracy comparison vs VLM baseline
-- [ ] Fallback cascade (OCR -> VLM)
-- [ ] Dual-mode logging (production + testing)
+### Milestone 2.5: Debug & Diagnostics ✓ COMPLETE
+- [x] Structured logging system (core/logger.py)
+- [x] Debug output directory with timestamped screenshots (debug/, logs/)
+- [x] Log levels: DEBUG, INFO, WARN, ERROR
+- [x] Foreground warning when window not focused
 
-### Milestone 4: AI Decision Loop
-- [ ] Structured action schema
-- [ ] Decision prompt with context (URL, history, goal)
-- [ ] Action executor (click, scroll, type, navigate)
-- [ ] Page load detection
+### Milestone 2.6: Keyboard Input ✓ COMPLETE
+- [x] Human-like keyboard input (input/keyboard.py)
+- [x] Variable typing speed (human cadence)
+- [x] Special keys (Enter, Tab, Ctrl+T, etc.)
+- [x] OS-level input only (pynput, never Selenium)
 
-### Milestone 5: Persona System
-- [ ] Persona schema (demographics, behavior, habits)
-- [ ] Persona injection into prompts
+### Milestone 2.7: Realistic Integration Tests ✓ COMPLETE
+- [x] Test: Open new tab (Ctrl+T)
+- [x] Test: Type URL in address bar
+- [x] Test: Navigate and verify page loaded
+- [x] Test: Switch between tabs
+- [x] Test: Search random terms
+- [x] Test: Coordinated mouse + keyboard sequences
+- [x] Tests: tests/test_integration_real.py (7 passing)
+
+### Milestone 3: AI Decision Loop
+**Goal: Random browsing** - AI explores pages naturally
+- [ ] Structured action schema (ai/actions.py)
+- [ ] Decision prompt: "What would a human do next?"
+- [ ] Action executor (click, scroll, type, wait)
+- [ ] Browsing loop: screenshot → decide → act → verify → repeat
+- [ ] Safety checks (avoid logout, purchases, form submissions)
+- [ ] Page state detection (loaded, loading, error)
+
+### Milestone 4: Persona System
+- [ ] Persona schema (demographics, interests, behavior)
+- [ ] Persona injection into decision prompts
 - [ ] Persona persistence per AdsPower profile
+
+### Milestone 5: Element Detection Optimization
+- [ ] PaddleOCR wrapper (fast text detection)
+- [ ] OmniParser integration (icon/button detection)
+- [ ] Fallback cascade: OCR → OmniParser → VLM
+- [ ] Accuracy comparison vs VLM baseline
 
 ### Milestone 6: Session Management
 - [ ] Session state machine
@@ -88,9 +113,9 @@
 Each milestone has explicit success criteria:
 - Milestone 1: Both APIs respond successfully
 - Milestone 2: Click lands on correct element 90%+ of time
-- Milestone 3: OCR matches VLM 80%+ on test set
-- Milestone 4: AI makes reasonable decisions on 5 different page types
-- Milestone 5: Persona influences behavior consistently
+- Milestone 3: AI browses autonomously for 2+ minutes without crashing
+- Milestone 4: Persona influences browsing behavior consistently
+- Milestone 5: OCR/OmniParser matches VLM 80%+ on test set
 - Milestone 6: Session survives interruption and resumes
 - Milestone 7: Complete 30-minute multi-site session
 

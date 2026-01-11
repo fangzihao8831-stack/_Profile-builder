@@ -59,6 +59,9 @@ config.json
 *.log
 logs/
 
+# Debug output
+debug/
+
 # OS files
 .DS_Store
 Thumbs.db
