@@ -62,14 +62,32 @@
 - [x] Test: Coordinated mouse + keyboard sequences
 - [x] Tests: tests/test_integration_real.py (7 passing)
 
-### Milestone 3: AI Decision Loop
-**Goal: Random browsing** - AI explores pages naturally
-- [ ] Structured action schema (ai/actions.py)
-- [ ] Decision prompt: "What would a human do next?"
-- [ ] Action executor (click, scroll, type, wait)
-- [ ] Browsing loop: screenshot → decide → act → verify → repeat
-- [ ] Safety checks (avoid logout, purchases, form submissions)
-- [ ] Page state detection (loaded, loading, error)
+### Milestone 3: AI Decision Loop (IN PROGRESS)
+**Goal: Human-like browsing** - AI browses fashion sites with realistic behavior
+**Test Profile**: k18il1i6
+
+**Human-Like Requirements**:
+- Dwell time: 5-30s after clicks (simulates reading/viewing)
+- Click variety: Mix of items, images, categories (not just scrolling)
+- Search behavior: Start with search, explore results naturally
+- Natural flow: Search → Browse → Click item → View → Back → Explore
+
+**Already Drafted** (untracked, ready to commit):
+- [x] Structured action schema (ai/actions.py) - CLICK, TYPE, SCROLL, WAIT, NAVIGATE
+- [x] Decision maker (ai/decision_maker.py) - VLM decides actions with safety checks
+- [x] Session planner (ai/session_planner.py) - NEWS, YOUTUBE, FASHION, FORUMS, SHOPPING
+- [x] Safety checker (core/safety.py) - Blocks logout, purchases, form submissions
+
+**To Build**:
+- [ ] Action executor (ai/action_executor.py) - Execute actions using input modules
+- [ ] Browsing session (core/session.py) - Main loop with human-like timing
+- [ ] CLI entry point (run.py) - `python run.py browse <profile_id> --structure fashion`
+- [ ] Tests (tests/test_milestone3.py)
+
+**Timing Constants**:
+- DWELL_TIME: 5-30s after clicking items
+- SCROLL_PAUSE: 2-5s after scrolling
+- ACTION_COOLDOWN: 1-2s between actions
 
 ### Milestone 4: Persona System
 - [ ] Persona schema (demographics, interests, behavior)
@@ -113,7 +131,7 @@
 Each milestone has explicit success criteria:
 - Milestone 1: Both APIs respond successfully
 - Milestone 2: Click lands on correct element 90%+ of time
-- Milestone 3: AI browses autonomously for 2+ minutes without crashing
+- Milestone 3: AI browses like a human - varied actions, dwell times, 60-70% time spent "reading"
 - Milestone 4: Persona influences browsing behavior consistently
 - Milestone 5: OCR/OmniParser matches VLM 80%+ on test set
 - Milestone 6: Session survives interruption and resumes
